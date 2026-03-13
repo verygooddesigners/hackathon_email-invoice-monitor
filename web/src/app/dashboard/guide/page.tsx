@@ -128,18 +128,18 @@ export default function GuidePage() {
         <div>
           <h1 className="text-2xl font-bold">User Guide</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Everything you need to know about Invoice Monitor
+            Everything you need to know about RotoMath
           </p>
         </div>
 
         {/* ---- Overview ---- */}
         <SectionCard
           id="overview"
-          title="What Is Invoice Monitor?"
+          title="What Is RotoMath?"
           description="AI-powered invoice validation for GDC Group"
         >
           <p>
-            Invoice Monitor automatically scans incoming Outlook emails for invoices, extracts line
+            RotoMath automatically scans incoming Outlook emails for invoices, extracts line
             items using Claude AI, and checks whether the math adds up. When the stated total on an
             invoice doesn&apos;t match the sum of line items, the app flags it as a discrepancy alert so
             your AP team can follow up before payment.
@@ -161,7 +161,7 @@ export default function GuidePage() {
               <h3 className="font-semibold text-foreground mb-2">1. Create an Account</h3>
               <p>
                 Go to the app URL and click <strong>Register</strong> to create a login. You&apos;ll need
-                an email address and password. This is your Invoice Monitor login — it&apos;s separate
+                an email address and password. This is your RotoMath login — it&apos;s separate
                 from your Outlook credentials.
               </p>
             </div>

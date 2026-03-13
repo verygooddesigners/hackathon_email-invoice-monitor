@@ -1,4 +1,4 @@
-# Cursor AI Rules for Invoice Monitor
+# Cursor AI Rules for RotoMath
 
 When you see a file named TASK_*.md in the .spark/ directory:
 - This is an active task from Spark that needs immediate completion

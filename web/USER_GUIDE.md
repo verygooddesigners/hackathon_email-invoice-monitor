@@ -1,4 +1,4 @@
-# Invoice Monitor — User Guide
+# RotoMath — User Guide
 
 *Last updated: March 13, 2026*
 
@@ -6,7 +6,7 @@
 
 ## What This App Does
 
-Invoice Monitor is an AI-powered tool built for GDC Group that automatically scans incoming Outlook emails for invoices, extracts line items using Claude AI, and checks whether the math adds up. When the stated total on an invoice doesn't match the sum of line items, the app flags it as a discrepancy alert so your AP team can follow up before payment.
+RotoMath is an AI-powered tool built for GDC Group that automatically scans incoming Outlook emails for invoices, extracts line items using Claude AI, and checks whether the math adds up. When the stated total on an invoice doesn't match the sum of line items, the app flags it as a discrepancy alert so your AP team can follow up before payment.
 
 The app runs on a scheduled basis (configurable per account), so once it's set up you don't need to do anything — it works in the background.
 
@@ -16,7 +16,7 @@ The app runs on a scheduled basis (configurable per account), so once it's set u
 
 ### 1. Create an Account
 
-Go to the app URL and click **Register** to create a login. You'll need an email address and password. This is your Invoice Monitor login — it's separate from your Outlook credentials.
+Go to the app URL and click **Register** to create a login. You'll need an email address and password. This is your RotoMath login — it's separate from your Outlook credentials.
 
 ### 2. Sign In
 

@@ -238,7 +238,7 @@ ${items}
 Original Subject: ${subject}
 Source Inbox: ${inbox}
 
-— Invoice Monitor`;
+— RotoMath`;
 }
 
 function buildFreelancerReply(invoice: any): string {
@@ -260,5 +260,5 @@ ${items}
 Could you please review and resubmit? If we misread something, let us know.
 
 Thank you,
-Invoice Monitor`;
+RotoMath`;
 }

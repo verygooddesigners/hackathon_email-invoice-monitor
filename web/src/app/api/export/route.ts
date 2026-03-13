@@ -65,7 +65,7 @@ function buildCsv(alerts: AlertRow[]): string {
 
 async function buildExcel(alerts: AlertRow[]): Promise<Buffer> {
   const workbook = new ExcelJS.Workbook();
-  workbook.creator = "Invoice Monitor";
+  workbook.creator = "RotoMath";
   workbook.created = new Date();
 
   const sheet = workbook.addWorksheet("Discrepancy Report");

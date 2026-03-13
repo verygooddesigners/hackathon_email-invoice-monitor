@@ -7,7 +7,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Invoice Monitor",
+  title: "RotoMath",
   description: "Monitor Outlook inboxes for invoice discrepancies",
 };
 

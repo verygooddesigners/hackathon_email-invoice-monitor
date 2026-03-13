@@ -59,7 +59,7 @@ Line Items:
 Original Email Subject: {original_subject}
 Source Inbox: {inbox_email}
 
-This is an automated alert from Invoice Monitor.
+This is an automated alert from RotoMath.
 """
 
     subject = f"\u26a0\ufe0f Invoice Discrepancy Detected \u2014 {invoice.freelancer_name}"
@@ -104,7 +104,7 @@ Here are the line items as we read them:
 Could you please review and resubmit a corrected invoice? If we've misread something, just let us know and we'll take another look.
 
 Thank you,
-Invoice Monitor
+RotoMath
 """
 
     subject = f"Re: {original_subject}"

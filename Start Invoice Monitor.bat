@@ -1,6 +1,6 @@
 @echo off
 REM ============================================================
-REM  Invoice Monitor — Windows Launcher
+REM  RotoMath — Windows Launcher
 REM  Double-click this file to start the control panel.
 REM ============================================================
 
@@ -8,7 +8,7 @@ cd /d "%~dp0"
 
 echo.
 echo ============================================
-echo   Invoice Monitor — Starting up...
+echo   RotoMath — Starting up...
 echo ============================================
 echo.
 

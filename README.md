@@ -1,4 +1,4 @@
-# Invoice Monitor
+# RotoMath
 
 A Python service that monitors two Gmail inboxes for freelancer invoices, extracts financial data using the Anthropic API (Claude), validates the math, logs everything to Google Sheets, and sends alerts when discrepancies are found.
 

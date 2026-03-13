@@ -100,7 +100,7 @@ class SheetsService:
 
             spreadsheet = service.spreadsheets().create(
                 body={
-                    "properties": {"title": f"Invoice Monitor — {email}"},
+                    "properties": {"title": f"RotoMath — {email}"},
                     "sheets": [{"properties": {"title": "Invoices"}}],
                 }
             ).execute()

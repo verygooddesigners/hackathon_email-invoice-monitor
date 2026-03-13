@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================================
-#  Invoice Monitor — Mac Launcher
+#  RotoMath — Mac Launcher
 #  Double-click this file to start the control panel.
 # ============================================================
 
@@ -9,7 +9,7 @@ cd "$(dirname "$0")"
 
 echo ""
 echo "============================================"
-echo "  Invoice Monitor — Starting up..."
+echo "  RotoMath — Starting up..."
 echo "============================================"
 echo ""
 

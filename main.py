@@ -1,4 +1,4 @@
-"""Invoice Monitor — Main entry point and orchestrator.
+"""RotoMath — Main entry point and orchestrator.
 
 Monitors two Gmail inboxes for freelancer invoices, extracts financial data
 using the Anthropic API, validates the math, logs to Google Sheets, and sends
@@ -158,7 +158,7 @@ def run_monitoring_cycle() -> None:
 def main():
     """Entry point — run one immediate cycle then start the scheduler."""
     logger.info("=" * 60)
-    logger.info("  Invoice Monitor starting up")
+    logger.info("  RotoMath starting up")
     logger.info(f"  Inbox 1: {config.INBOX_1_EMAIL}")
     logger.info(f"  Inbox 2: {config.INBOX_2_EMAIL}")
     logger.info(f"  Poll interval: {config.POLL_INTERVAL_MINUTES} minutes")
@@ -181,7 +181,7 @@ def main():
     try:
         scheduler.start()
     except (KeyboardInterrupt, SystemExit):
-        logger.info("Invoice Monitor shutting down")
+        logger.info("RotoMath shutting down")
         scheduler.shutdown()
 
 

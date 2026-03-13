@@ -100,7 +100,7 @@ export function DashboardNav({ user }: { user: { email?: string | null; name?: s
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-8">
           <Link href="/dashboard" className="font-bold text-lg">
-            Invoice Monitor
+            RotoMath
           </Link>
           <nav className="flex gap-1">
             {navItems.map((item) => (

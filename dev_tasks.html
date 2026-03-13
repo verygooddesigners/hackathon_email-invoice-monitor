@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Invoice Monitor — Dev Tasks</title>
+<title>RotoMath — Dev Tasks</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -255,7 +255,7 @@
 </head>
 <body>
 
-<h1>Invoice Monitor — Dev Tasks</h1>
+<h1>RotoMath — Dev Tasks</h1>
 
 <div class="api-key-bar">
   <span>Anthropic API Key (dev only):</span>
@@ -317,8 +317,8 @@
 </div>
 
 <script>
-const STORAGE_KEY = 'invoice-monitor-tasks';
-const API_KEY_STORAGE = 'invoice-monitor-api-key';
+const STORAGE_KEY = 'rotomath-tasks';
+const API_KEY_STORAGE = 'rotomath-api-key';
 
 // Load state
 let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{"tasks":[]}').tasks;
@@ -449,7 +449,7 @@ async function processTaskWithAI(taskId) {
     complexity: t.ai_complexity,
   }));
 
-  const systemPrompt = `You are a task analysis assistant for a software project (Invoice Monitor — a Python service that monitors Gmail inboxes for freelancer invoices).
+  const systemPrompt = `You are a task analysis assistant for a software project (RotoMath — a Python service that monitors Gmail inboxes for freelancer invoices).
 
 Analyze the new task in the context of all existing tasks. Return a JSON object with:
 - title: A short display title (max 60 chars)
