@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { exchangeCode } from "@/lib/gmail";
+import { exchangeCode } from "@/lib/outlook";
 import { prisma } from "@/lib/db";
 
 /**
- * Google OAuth callback — exchanges the code for tokens and stores them.
+ * Microsoft OAuth callback — exchanges the code for tokens and stores them.
  * The `state` parameter is the account ID.
  */
 export async function GET(req: NextRequest) {

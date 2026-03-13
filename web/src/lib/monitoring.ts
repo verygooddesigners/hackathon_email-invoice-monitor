@@ -4,16 +4,17 @@
  */
 import { prisma } from "./db";
 import {
-  getGmailClient,
+  OutlookTokens,
+  getValidTokens,
   getUnreadMessages,
   markAsRead,
   getAttachments,
   getSubject,
   getSenderEmail,
+  getBodyText,
   sendEmail,
-  GmailTokens,
-} from "./gmail";
-import { extractEmailBody } from "./parsers/email";
+  sendReply,
+} from "./outlook";
 import { extractDocxText } from "./parsers/docx";
 import { extractExcelText } from "./parsers/xlsx";
 import { extractInvoiceData } from "./extractor";
@@ -38,8 +39,17 @@ export async function processAccount(accountId: string): Promise<{
       return result;
     }
 
-    const tokens: GmailTokens = JSON.parse(account.googleTokens);
-    const gmail = getGmailClient(tokens);
+    // Get valid access token (refresh if needed)
+    const storedTokens: OutlookTokens = JSON.parse(account.googleTokens);
+    const { accessToken, tokens: currentTokens, refreshed } = await getValidTokens(storedTokens);
+
+    // If tokens were refreshed, save them
+    if (refreshed) {
+      await prisma.monitoredAccount.update({
+        where: { id: account.id },
+        data: { googleTokens: JSON.stringify(currentTokens) },
+      });
+    }
 
     // Build rules list
     const rules: RuleConfig[] = account.rules.map((r: any) => ({
@@ -48,11 +58,11 @@ export async function processAccount(accountId: string): Promise<{
     }));
 
     // Fetch unread messages
-    const messages = await getUnreadMessages(gmail);
+    const messages = await getUnreadMessages(accessToken);
     if (messages.length === 0) return result;
 
     for (const message of messages) {
-      const messageId = message.id!;
+      const messageId = message.id;
 
       try {
         // Check if already processed
@@ -66,13 +76,13 @@ export async function processAccount(accountId: string): Promise<{
         });
 
         if (existing) {
-          await markAsRead(gmail, messageId);
+          await markAsRead(accessToken, messageId);
           continue;
         }
 
         // Apply monitoring rules
         if (!messagePassesRules(message, rules)) {
-          await markAsRead(gmail, messageId);
+          await markAsRead(accessToken, messageId);
           continue;
         }
 
@@ -80,26 +90,30 @@ export async function processAccount(accountId: string): Promise<{
         console.log(`Processing: ${subject} (${messageId})`);
 
         // Extract email body
-        const bodyText = extractEmailBody(message.payload || {});
+        const bodyText = getBodyText(message);
 
         // Download and parse attachments
         const attachmentTexts: string[] = [];
         let attachmentName = "";
 
-        const attachments = await getAttachments(gmail, message);
-        for (const att of attachments) {
-          const ext = att.filename.slice(att.filename.lastIndexOf(".")).toLowerCase();
-          let parsed = "";
+        if (message.hasAttachments) {
+          const attachments = await getAttachments(accessToken, messageId);
+          for (const att of attachments) {
+            const ext = att.name.slice(att.name.lastIndexOf(".")).toLowerCase();
+            let parsed = "";
 
-          if (ext === ".docx" || ext === ".doc") {
-            parsed = await extractDocxText(att.data);
-          } else if (ext === ".xlsx" || ext === ".xls") {
-            parsed = extractExcelText(att.data);
-          }
+            if (ext === ".docx" || ext === ".doc") {
+              const buffer = Buffer.from(att.contentBytes, "base64");
+              parsed = await extractDocxText(buffer);
+            } else if (ext === ".xlsx" || ext === ".xls") {
+              const buffer = Buffer.from(att.contentBytes, "base64");
+              parsed = extractExcelText(buffer);
+            }
 
-          if (parsed && !parsed.startsWith("[ERROR]")) {
-            attachmentTexts.push(parsed);
-            attachmentName = att.filename;
+            if (parsed && !parsed.startsWith("[ERROR]")) {
+              attachmentTexts.push(parsed);
+              attachmentName = att.name;
+            }
           }
         }
 
@@ -110,7 +124,7 @@ export async function processAccount(accountId: string): Promise<{
         }
 
         if (!combinedText.trim()) {
-          await markAsRead(gmail, messageId);
+          await markAsRead(accessToken, messageId);
           await recordProcessed(account.id, messageId);
           continue;
         }
@@ -118,7 +132,7 @@ export async function processAccount(accountId: string): Promise<{
         // Extract invoice data
         const extracted = await extractInvoiceData(combinedText);
         if (!extracted) {
-          await markAsRead(gmail, messageId);
+          await markAsRead(accessToken, messageId);
           await recordProcessed(account.id, messageId);
           continue;
         }
@@ -149,7 +163,7 @@ export async function processAccount(accountId: string): Promise<{
           // Send internal alert
           try {
             await sendEmail(
-              gmail,
+              accessToken,
               account.email,
               `⚠️ Invoice Discrepancy — ${validated.freelancer_name}`,
               buildInternalAlert(validated, subject, account.email)
@@ -162,12 +176,10 @@ export async function processAccount(accountId: string): Promise<{
           try {
             const senderEmail = getSenderEmail(message);
             if (senderEmail) {
-              await sendEmail(
-                gmail,
-                senderEmail,
-                `Re: ${subject}`,
-                buildFreelancerReply(validated),
-                message.threadId || undefined
+              await sendReply(
+                accessToken,
+                messageId,
+                buildFreelancerReply(validated)
               );
             }
           } catch (e) {
@@ -175,13 +187,13 @@ export async function processAccount(accountId: string): Promise<{
           }
         }
 
-        await markAsRead(gmail, messageId);
+        await markAsRead(accessToken, messageId);
         await recordProcessed(account.id, messageId);
       } catch (e: any) {
         console.error(`Error processing message ${messageId}:`, e);
         result.errors.push(e.message || String(e));
         try {
-          await markAsRead(gmail, messageId);
+          await markAsRead(accessToken, messageId);
         } catch {}
       }
     }

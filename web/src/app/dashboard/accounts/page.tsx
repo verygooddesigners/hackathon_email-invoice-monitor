@@ -146,7 +146,7 @@ export default function AccountsPage() {
         <div>
           <h1 className="text-2xl font-bold">Monitored Accounts</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Connect Gmail accounts to monitor for invoice discrepancies
+            Connect Outlook accounts to monitor for invoice discrepancies
           </p>
         </div>
         <Dialog open={addOpen} onOpenChange={setAddOpen}>
@@ -155,9 +155,9 @@ export default function AccountsPage() {
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Connect Gmail Account</DialogTitle>
+              <DialogTitle>Connect Outlook Account</DialogTitle>
               <DialogDescription>
-                Enter the email address to monitor. You&apos;ll be redirected to Google to grant access.
+                Enter the email address to monitor. You&apos;ll be redirected to Google to grant access to your mailbox.
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleAddAccount} className="space-y-4 mt-2">
@@ -167,7 +167,7 @@ export default function AccountsPage() {
                 </div>
               )}
               <div className="space-y-2">
-                <Label htmlFor="email">Gmail Address</Label>
+                <Label htmlFor="email">Outlook Email Address</Label>
                 <Input
                   id="email"
                   type="email"
@@ -193,7 +193,7 @@ export default function AccountsPage() {
                 </Select>
               </div>
               <Button type="submit" className="w-full" disabled={saving}>
-                {saving ? "Connecting..." : "Connect with Google"}
+                {saving ? "Connecting..." : "Connect with Microsoft"}
               </Button>
             </form>
           </DialogContent>
@@ -207,7 +207,7 @@ export default function AccountsPage() {
           <CardContent className="p-8 text-center">
             <p className="text-lg font-medium">No accounts connected</p>
             <p className="text-muted-foreground text-sm mt-1">
-              Add a Gmail account to start monitoring invoices for math discrepancies.
+              Add an Outlook account to start monitoring invoices for math discrepancies.
             </p>
             <Button className="mt-4" onClick={() => setAddOpen(true)}>
               Add Your First Account
@@ -229,7 +229,7 @@ export default function AccountsPage() {
                         <Badge variant="secondary">Paused</Badge>
                       )
                     ) : (
-                      <Badge variant="outline">Awaiting OAuth</Badge>
+                      <Badge variant="outline">Awaiting Microsoft sign-in</Badge>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
