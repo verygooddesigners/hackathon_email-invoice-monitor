@@ -11,6 +11,7 @@ const navItems = [
   { href: "/dashboard", label: "Alerts" },
   { href: "/dashboard/accounts", label: "Accounts" },
   { href: "/dashboard/rules", label: "Rules" },
+  { href: "/dashboard/guide", label: "Guide" },
 ];
 
 function SunIcon() {

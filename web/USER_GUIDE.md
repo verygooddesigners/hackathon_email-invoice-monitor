@@ -2,6 +2,8 @@
 
 *Last updated: March 13, 2026*
 
+> **Note:** This guide is also available in-app at `/dashboard/guide` with the same UI as the rest of the application. The markdown version here serves as a reference copy.
+
 ## What This App Does
 
 Invoice Monitor is an AI-powered tool built for GDC Group that automatically scans incoming Outlook emails for invoices, extracts line items using Claude AI, and checks whether the math adds up. When the stated total on an invoice doesn't match the sum of line items, the app flags it as a discrepancy alert so your AP team can follow up before payment.
@@ -211,6 +213,6 @@ The monitoring cron job is configured in `vercel.json` and currently runs every 
 
 | Date | Changes |
 |------|---------|
-| March 13, 2026 | Added light/dark theme with toggle, mock data preview, summary stat cards, rules page UI improvements, default AI math-check documentation |
+| March 13, 2026 | Added in-app user guide at /dashboard/guide, light/dark theme with toggle, mock data preview, summary stat cards, rules page UI improvements, default AI math-check documentation |
 | March 12, 2026 | Migrated from Gmail to Outlook (Microsoft Graph API) |
 | March 11, 2026 | Initial release — Next.js web app with multi-user auth, rules engine, AI extraction, and Vercel deployment |
