@@ -52,11 +52,29 @@ This is the main dashboard. It shows every invoice where the AI detected a math 
 - **Calculated** — the total the AI got by summing the line items
 - **Discrepancy** — the difference (shown as a red badge)
 
-**Expanding a row**: Click any row to see more details — the invoice date, source email address, attachment filename, and the raw line items the AI extracted.
+**Clicking a row**: Click any row to open the full **Alert Detail** page for that invoice. This page shows:
+
+- **Email metadata** — sender, recipient, subject line, and attachment filename
+- **Discrepancy summary** — three cards showing the Stated total, Calculated total, and the Discrepancy amount
+- **Invoice Document** — a rendered view of the invoice with error lines highlighted in red (red left border and pale red background) so you can immediately see where the problems are
+- **Issues Found** — a panel listing each detected issue with a severity badge (High = red, Medium = yellow, Low = blue) and a description of the problem
+- **Line Items Breakdown** — the raw extracted line items in JSON format
+
+Use the **Back to Alerts** button at the top to return to the main dashboard.
 
 **Filtering**: Use the dropdown in the top-right to filter alerts by Outlook account if you're monitoring multiple inboxes.
 
 **Pagination**: If there are more than 20 alerts, use the Previous/Next buttons at the bottom to page through them.
+
+### Notifications
+
+A **bell icon** in the top navigation bar shows real-time notifications when new discrepancies are detected. The bell displays an unread count badge when there are unread notifications.
+
+**Clicking the bell** opens a popover with a list of recent notifications. Each notification shows the freelancer name, a brief description of the discrepancy, and how long ago it was detected. Unread notifications are highlighted with a blue dot and a subtle background color.
+
+**Clicking a notification** marks it as read and navigates to the full Alert Detail page for that invoice.
+
+**Mark all read**: Use the "Mark all read" link at the top of the popover to clear all unread indicators at once.
 
 ### Accounts
 
@@ -213,6 +231,6 @@ The monitoring cron job is configured in `vercel.json` and currently runs every 
 
 | Date | Changes |
 |------|---------|
-| March 13, 2026 | Added in-app user guide at /dashboard/guide, light/dark theme with toggle, mock data preview, summary stat cards, rules page UI improvements, default AI math-check documentation |
+| March 13, 2026 | Added alert detail page with highlighted invoice errors and issue severity badges, clickable alert rows navigate to detail view, notifications bell icon with popover in navbar, in-app user guide at /dashboard/guide, light/dark theme with toggle, mock data preview, summary stat cards, rules page UI improvements, default AI math-check documentation |
 | March 12, 2026 | Migrated from Gmail to Outlook (Microsoft Graph API) |
 | March 11, 2026 | Initial release — Next.js web app with multi-user auth, rules engine, AI extraction, and Vercel deployment |

@@ -21,6 +21,8 @@ const sections = [
   { id: "overview", label: "Overview" },
   { id: "getting-started", label: "Getting Started" },
   { id: "alerts", label: "Alerts Dashboard" },
+  { id: "alert-detail", label: "Alert Detail" },
+  { id: "notifications", label: "Notifications" },
   { id: "accounts", label: "Accounts" },
   { id: "rules", label: "Rules" },
   { id: "ai-pipeline", label: "AI Processing" },
@@ -218,7 +220,7 @@ export default function GuidePage() {
               <h3 className="font-semibold text-foreground mb-2">Alerts Table</h3>
               <p>Each row shows a flagged invoice with the date, freelancer, invoice number, account, stated total, calculated total, and the discrepancy amount (as a red badge).</p>
               <p className="mt-2">
-                <strong>Click any row</strong> to expand it and see more details — invoice date, source email, attachment filename, and the raw line items the AI extracted.
+                <strong>Click any row</strong> to open the full Alert Detail page for that invoice.
               </p>
             </div>
 
@@ -227,6 +229,86 @@ export default function GuidePage() {
               <p>
                 Use the dropdown in the top-right to filter by Outlook account. If there are more than
                 20 alerts, use Previous/Next buttons to page through them.
+              </p>
+            </div>
+          </div>
+        </SectionCard>
+
+        {/* ---- Alert Detail ---- */}
+        <SectionCard
+          id="alert-detail"
+          title="Alert Detail Page"
+          description="Full breakdown of a flagged invoice"
+        >
+          <p>
+            Click any alert row on the dashboard to open its detail page. This page provides a
+            comprehensive view of the flagged invoice:
+          </p>
+          <div className="space-y-3 mt-3">
+            <div className="border border-border rounded-lg p-3">
+              <p className="font-semibold text-foreground">Email Metadata</p>
+              <p className="text-muted-foreground mt-1">
+                Shows the sender, recipient, subject line, and attachment filename so you can
+                quickly identify the source email.
+              </p>
+            </div>
+            <div className="border border-border rounded-lg p-3">
+              <p className="font-semibold text-foreground">Discrepancy Summary</p>
+              <p className="text-muted-foreground mt-1">
+                Three cards showing the Stated total (what the freelancer claimed), the Calculated
+                total (what the AI computed), and the Discrepancy (the difference, highlighted in red).
+              </p>
+            </div>
+            <div className="border border-border rounded-lg p-3">
+              <p className="font-semibold text-foreground">Invoice Document View</p>
+              <p className="text-muted-foreground mt-1">
+                A rendered view of the invoice where <strong>error lines are highlighted</strong> with
+                a red left border and a pale red background, so you can immediately see where the
+                problems are.
+              </p>
+            </div>
+            <div className="border border-border rounded-lg p-3">
+              <p className="font-semibold text-foreground">Issues Found</p>
+              <p className="text-muted-foreground mt-1">
+                A panel listing each detected issue with a severity badge —{" "}
+                <Badge variant="destructive" className="text-xs mx-0.5">High</Badge>
+                <Badge className="text-xs mx-0.5 bg-yellow-500 text-white hover:bg-yellow-500">Medium</Badge>
+                <Badge className="text-xs mx-0.5 bg-blue-500 text-white hover:bg-blue-500">Low</Badge>
+                — and a description of the problem.
+              </p>
+            </div>
+          </div>
+          <p className="mt-3">
+            Use the <strong>Back to Alerts</strong> button at the top to return to the main dashboard.
+          </p>
+        </SectionCard>
+
+        {/* ---- Notifications ---- */}
+        <SectionCard
+          id="notifications"
+          title="Notifications"
+          description="Stay on top of new discrepancies"
+        >
+          <p>
+            A <strong>bell icon</strong> in the top navigation bar shows real-time notifications when
+            new discrepancies are detected. The bell displays an unread count badge when there are
+            unread notifications.
+          </p>
+          <div className="space-y-3 mt-3">
+            <div className="border border-border rounded-lg p-3">
+              <p className="font-semibold text-foreground">Viewing Notifications</p>
+              <p className="text-muted-foreground mt-1">
+                Click the bell icon to open a popover with recent notifications. Each shows the
+                freelancer name, a brief description, and how long ago it was detected. Unread
+                notifications are highlighted with a blue dot.
+              </p>
+            </div>
+            <div className="border border-border rounded-lg p-3">
+              <p className="font-semibold text-foreground">Taking Action</p>
+              <p className="text-muted-foreground mt-1">
+                Click any notification to mark it as read and jump directly to the Alert Detail page
+                for that invoice. Use <strong>Mark all read</strong> at the top of the popover to
+                clear all unread indicators at once.
               </p>
             </div>
           </div>
@@ -550,7 +632,7 @@ export default function GuidePage() {
             <TableBody>
               <TableRow>
                 <TableCell className="whitespace-nowrap font-medium">Mar 13, 2026</TableCell>
-                <TableCell>Added in-app user guide, light/dark theme with toggle, mock data preview, summary stat cards, rules page improvements, default AI math-check documentation</TableCell>
+                <TableCell>Alert detail page with highlighted invoice errors, clickable alert rows, notifications bell with popover, in-app user guide, light/dark theme, mock data preview, summary stat cards</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className="whitespace-nowrap font-medium">Mar 12, 2026</TableCell>

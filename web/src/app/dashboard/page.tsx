@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,13 +43,13 @@ interface Account {
 }
 
 export default function AlertsDashboard() {
+  const router = useRouter();
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedAccount, setSelectedAccount] = useState<string>("all");
   const [page, setPage] = useState(0);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [usingMockData, setUsingMockData] = useState(false);
   const limit = 20;
 
@@ -214,11 +215,10 @@ export default function AlertsDashboard() {
               </TableHeader>
               <TableBody>
                 {alerts.map((alert) => (
-                  <>
                     <TableRow
                       key={alert.id}
                       className="cursor-pointer hover:bg-secondary/50"
-                      onClick={() => setExpandedId(expandedId === alert.id ? null : alert.id)}
+                      onClick={() => router.push(`/dashboard/alerts/${alert.id}`)}
                     >
                       <TableCell className="text-sm">{formatDate(alert.createdAt)}</TableCell>
                       <TableCell className="font-medium">{alert.freelancer}</TableCell>
@@ -236,39 +236,6 @@ export default function AlertsDashboard() {
                         </Badge>
                       </TableCell>
                     </TableRow>
-                    {expandedId === alert.id && (
-                      <TableRow key={`${alert.id}-detail`}>
-                        <TableCell colSpan={7} className="bg-secondary/30 p-4">
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                              <span className="text-muted-foreground">Invoice Date:</span>{" "}
-                              {alert.invoiceDate || "Not specified"}
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Source Email:</span>{" "}
-                              {alert.sourceEmail}
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Attachment:</span>{" "}
-                              {alert.attachment || "Email body"}
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Line Items:</span>
-                              <pre className="mt-1 text-xs bg-card p-2 rounded max-h-32 overflow-auto border border-border">
-                                {(() => {
-                                  try {
-                                    return JSON.stringify(JSON.parse(alert.lineItems), null, 2);
-                                  } catch {
-                                    return alert.lineItems;
-                                  }
-                                })()}
-                              </pre>
-                            </div>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </>
                 ))}
               </TableBody>
             </Table>
