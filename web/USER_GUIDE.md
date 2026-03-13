@@ -131,7 +131,7 @@ When the monitor runs for an account, here's what happens for each unread email:
 
 1. **Rule Check** — If rules exist, the email must pass all enabled rules. If no rules exist, all emails pass through.
 2. **Duplicate Check** — The app tracks which emails have already been processed and skips them.
-3. **Text Extraction** — The app reads the email body. If there are .docx or .xlsx attachments, it extracts text from those too.
+3. **Text Extraction** — The app reads the email body. If there are .pdf, .docx, or .xlsx attachments, it extracts text from those too.
 4. **AI Extraction** — The combined text is sent to Claude AI, which identifies the freelancer name, invoice number, date, line items, and stated total.
 5. **Math Validation** — The app sums the extracted line items and compares them to the stated total. If they don't match, it's flagged as a discrepancy.
 6. **Alert Creation** — Discrepancies are saved as alerts and appear on the dashboard.
@@ -148,10 +148,9 @@ The email is then marked as read so it won't be processed again.
 The AI can extract invoice data from:
 
 - **Email body text** — plain text or HTML emails
+- **.pdf files** — PDF documents
 - **.docx files** — Microsoft Word documents
 - **.xlsx / .xls files** — Microsoft Excel spreadsheets
-
-PDF attachments are not currently supported.
 
 ---
 
@@ -231,6 +230,6 @@ The monitoring cron job is configured in `vercel.json` and currently runs every 
 
 | Date | Changes |
 |------|---------|
-| March 13, 2026 | Added alert detail page with highlighted invoice errors and issue severity badges, clickable alert rows navigate to detail view, notifications bell icon with popover in navbar, in-app user guide at /dashboard/guide, light/dark theme with toggle, mock data preview, summary stat cards, rules page UI improvements, default AI math-check documentation |
+| March 13, 2026 | Added PDF attachment support, alert detail page with highlighted invoice errors and issue severity badges, clickable alert rows navigate to detail view, notifications bell icon with popover in navbar, in-app user guide at /dashboard/guide, light/dark theme with toggle, mock data preview, summary stat cards, rules page UI improvements, default AI math-check documentation |
 | March 12, 2026 | Migrated from Gmail to Outlook (Microsoft Graph API) |
 | March 11, 2026 | Initial release — Next.js web app with multi-user auth, rules engine, AI extraction, and Vercel deployment |

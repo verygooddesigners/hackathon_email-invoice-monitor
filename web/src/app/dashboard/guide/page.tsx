@@ -429,7 +429,7 @@ export default function GuidePage() {
             {[
               { step: "1", title: "Rule Check", desc: "If rules exist, the email must pass all enabled rules. If no rules exist, all emails pass through." },
               { step: "2", title: "Duplicate Check", desc: "The app tracks which emails have already been processed and skips them." },
-              { step: "3", title: "Text Extraction", desc: "The app reads the email body. If there are .docx or .xlsx attachments, it extracts text from those too." },
+              { step: "3", title: "Text Extraction", desc: "The app reads the email body. If there are .pdf, .docx, or .xlsx attachments, it extracts text from those too." },
               { step: "4", title: "AI Extraction", desc: "The combined text is sent to Claude AI, which identifies the freelancer name, invoice number, date, line items, and stated total." },
               { step: "5", title: "Math Validation", desc: "The app sums the extracted line items and compares to the stated total. If they don't match, it's flagged." },
               { step: "6", title: "Alert Creation", desc: "Discrepancies are saved as alerts and appear on the dashboard." },
@@ -457,12 +457,19 @@ export default function GuidePage() {
           title="Supported File Types"
           description="What the AI can extract invoice data from"
         >
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <Card className="bg-secondary/30">
               <CardContent className="p-3 text-center">
                 <p className="text-2xl mb-1">📧</p>
                 <p className="font-semibold text-sm">Email Body</p>
                 <p className="text-xs text-muted-foreground mt-1">Plain text &amp; HTML</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-secondary/30">
+              <CardContent className="p-3 text-center">
+                <p className="text-2xl mb-1">📕</p>
+                <p className="font-semibold text-sm">.pdf</p>
+                <p className="text-xs text-muted-foreground mt-1">PDF documents</p>
               </CardContent>
             </Card>
             <Card className="bg-secondary/30">
@@ -480,7 +487,6 @@ export default function GuidePage() {
               </CardContent>
             </Card>
           </div>
-          <p className="text-muted-foreground mt-3">PDF attachments are not currently supported.</p>
         </SectionCard>
 
         {/* ---- Dark Mode ---- */}

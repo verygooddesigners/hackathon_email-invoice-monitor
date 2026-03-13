@@ -17,6 +17,7 @@ import {
 } from "./outlook";
 import { extractDocxText } from "./parsers/docx";
 import { extractExcelText } from "./parsers/xlsx";
+import { extractPdfText } from "./parsers/pdf";
 import { extractInvoiceData } from "./extractor";
 import { validateInvoice } from "./validator";
 import { messagePassesRules, RuleConfig } from "./rules";
@@ -109,6 +110,9 @@ export async function processAccount(accountId: string): Promise<{
             } else if (ext === ".xlsx" || ext === ".xls") {
               const buffer = Buffer.from(att.contentBytes, "base64");
               parsed = extractExcelText(buffer);
+            } else if (ext === ".pdf") {
+              const buffer = Buffer.from(att.contentBytes, "base64");
+              parsed = await extractPdfText(buffer);
             }
 
             if (parsed && !parsed.startsWith("[ERROR]")) {
