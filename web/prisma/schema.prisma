@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model User {
+  id              String             @id @default(cuid())
+  email           String             @unique
+  passwordHash    String             @map("password_hash")
+  name            String?
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
+  accounts        MonitoredAccount[]
+
+  @@map("users")
+}
+
+model MonitoredAccount {
+  id              String             @id @default(cuid())
+  userId          String             @map("user_id")
+  email           String
+  googleTokens    String?            @map("google_tokens") // encrypted JSON
+  sheetId         String?            @map("sheet_id")
+  cronSchedule    String             @default("*/5 * * * *") @map("cron_schedule")
+  lastRun         DateTime?          @map("last_run")
+  nextRun         DateTime?          @map("next_run")
+  enabled         Boolean            @default(true)
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
+
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rules           MonitoringRule[]
+  alerts          Alert[]
+  processedMsgs   ProcessedMessage[]
+
+  @@map("monitored_accounts")
+}
+
+model MonitoringRule {
+  id              String             @id @default(cuid())
+  accountId       String             @map("account_id")
+  ruleType        String             @map("rule_type") // "date_range", "subject_filter", "sender_filter", "attachment_only"
+  ruleValue       String             @map("rule_value") // JSON config for the rule
+  enabled         Boolean            @default(true)
+  createdAt       DateTime           @default(now()) @map("created_at")
+
+  account         MonitoredAccount   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("monitoring_rules")
+}
+
+model Alert {
+  id                String           @id @default(cuid())
+  accountId         String           @map("account_id")
+  freelancer        String
+  invoiceNumber     String?          @map("invoice_number")
+  invoiceDate       String?          @map("invoice_date")
+  statedTotal       Float            @map("stated_total")
+  calculatedTotal   Float            @map("calculated_total")
+  discrepancyAmount Float            @map("discrepancy_amount")
+  lineItems         String           @map("line_items") // JSON array
+  sourceEmail       String           @map("source_email")
+  attachment        String?
+  createdAt         DateTime         @default(now()) @map("created_at")
+
+  account           MonitoredAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("alerts")
+}
+
+model ProcessedMessage {
+  id              String             @id @default(cuid())
+  accountId       String             @map("account_id")
+  gmailMessageId  String             @map("gmail_message_id")
+  processedAt     DateTime           @default(now()) @map("processed_at")
+
+  account         MonitoredAccount   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, gmailMessageId])
+  @@map("processed_messages")
+}
