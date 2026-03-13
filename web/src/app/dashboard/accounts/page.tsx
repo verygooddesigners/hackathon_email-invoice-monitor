@@ -78,6 +78,21 @@ export default function AccountsPage() {
 
   useEffect(() => {
     loadAccounts();
+    // Show OAuth error messages from the callback redirect
+    const params = new URLSearchParams(window.location.search);
+    const oauthError = params.get("error");
+    const oauthMessage = params.get("message");
+    if (oauthError) {
+      setError(
+        oauthMessage
+          ? decodeURIComponent(oauthMessage)
+          : oauthError === "missing_params"
+          ? "Microsoft did not return an authorization code. Please try again."
+          : `OAuth error: ${oauthError}`
+      );
+      // Clean URL
+      window.history.replaceState({}, "", "/dashboard/accounts");
+    }
   }, []);
 
   async function handleAddAccount(e: React.FormEvent) {
@@ -216,6 +231,12 @@ export default function AccountsPage() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {error && !addOpen && (
+        <div className="bg-destructive/10 text-destructive text-sm px-4 py-3 rounded-lg border border-destructive/20">
+          <strong>Connection error:</strong> {error}
+        </div>
+      )}
 
       {usingMockData && (
         <div className="bg-primary/10 text-primary text-sm px-4 py-2 rounded-lg border border-primary/20">

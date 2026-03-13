@@ -9,8 +9,21 @@ import { prisma } from "@/lib/db";
 export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get("code");
   const state = req.nextUrl.searchParams.get("state"); // account ID
+  const error = req.nextUrl.searchParams.get("error");
+  const errorDescription = req.nextUrl.searchParams.get("error_description");
+
+  // Microsoft returned an error instead of an auth code
+  if (error) {
+    console.error("Microsoft OAuth error:", error, errorDescription);
+    const msg = encodeURIComponent(errorDescription || error);
+    return NextResponse.redirect(
+      new URL(`/dashboard/accounts?error=oauth_denied&message=${msg}`, req.url)
+    );
+  }
 
   if (!code || !state) {
+    // Log the full URL so we can diagnose what Microsoft sent
+    console.error("OAuth callback missing params. Full URL:", req.nextUrl.toString());
     return NextResponse.redirect(new URL("/dashboard/accounts?error=missing_params", req.url));
   }
 
