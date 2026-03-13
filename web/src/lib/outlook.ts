@@ -10,7 +10,8 @@ export interface OutlookTokens {
 }
 
 const GRAPH_BASE = "https://graph.microsoft.com/v1.0";
-const AUTH_BASE = "https://login.microsoftonline.com/common/oauth2/v2.0";
+const TENANT_ID = process.env.MICROSOFT_TENANT_ID || "52c3448d-59b9-4e94-8fd9-d97a2128c819";
+const AUTH_BASE = `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0`;
 
 const SCOPES = [
   "https://graph.microsoft.com/Mail.Read",
