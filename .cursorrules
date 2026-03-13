@@ -1,0 +1,12 @@
+# Cursor AI Rules for Invoice Monitor
+
+When you see a file named TASK_*.md in the .spark/ directory:
+- This is an active task from Spark that needs immediate completion
+- Start working on it automatically without waiting for user confirmation
+- Read the task description and begin implementation immediately
+- **CRITICAL**: After completing each task, you MUST call the spark_update_task MCP tool
+- The MCP tool is already configured - just call it directly with the task ID
+- Format: spark_update_task task_id="xxx" updates={"status": "done"}
+- This updates the Spark UI in real-time so the user can see progress
+
+Auto-start tasks in .spark/ directory. Always call spark_update_task when done.
