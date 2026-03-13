@@ -80,7 +80,8 @@ export async function processAccount(accountId: string): Promise<{
           continue;
         }
 
-        // Apply monitoring rules
+        // Apply monitoring rules (if no rules exist, ALL emails pass through
+        // and get the AI math check — this is the default/intended behavior)
         if (!messagePassesRules(message, rules)) {
           await markAsRead(accessToken, messageId);
           continue;

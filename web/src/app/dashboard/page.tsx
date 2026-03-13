@@ -19,6 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { MOCK_ALERTS, MOCK_ACCOUNTS_SIMPLE } from "@/lib/mock-data";
 
 interface Alert {
   id: string;
@@ -48,15 +49,39 @@ export default function AlertsDashboard() {
   const [selectedAccount, setSelectedAccount] = useState<string>("all");
   const [page, setPage] = useState(0);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [usingMockData, setUsingMockData] = useState(false);
   const limit = 20;
 
   useEffect(() => {
     fetch("/api/accounts")
       .then((r) => r.json())
-      .then((data) => setAccounts(Array.isArray(data) ? data : []));
+      .then((data) => {
+        const accs = Array.isArray(data) ? data : [];
+        if (accs.length === 0) {
+          // No real accounts — use mock data for preview
+          setAccounts(MOCK_ACCOUNTS_SIMPLE);
+          setAlerts(MOCK_ALERTS as Alert[]);
+          setTotal(MOCK_ALERTS.length);
+          setUsingMockData(true);
+          setLoading(false);
+        } else {
+          setAccounts(accs);
+          setUsingMockData(false);
+        }
+      })
+      .catch(() => {
+        setAccounts(MOCK_ACCOUNTS_SIMPLE);
+        setAlerts(MOCK_ALERTS as Alert[]);
+        setTotal(MOCK_ALERTS.length);
+        setUsingMockData(true);
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
+    if (usingMockData) return;
+    if (accounts.length === 0) return;
+
     setLoading(true);
     const params = new URLSearchParams({ limit: String(limit), offset: String(page * limit) });
     if (selectedAccount !== "all") params.set("accountId", selectedAccount);
@@ -64,13 +89,26 @@ export default function AlertsDashboard() {
     fetch(`/api/alerts?${params}`)
       .then((r) => r.json())
       .then((data) => {
-        setAlerts(data.alerts || []);
-        setTotal(data.total || 0);
+        const realAlerts = data.alerts || [];
+        if (realAlerts.length === 0 && page === 0) {
+          // No real alerts yet — show mock data
+          setAlerts(MOCK_ALERTS as Alert[]);
+          setTotal(MOCK_ALERTS.length);
+          setUsingMockData(true);
+        } else {
+          setAlerts(realAlerts);
+          setTotal(data.total || 0);
+        }
       })
       .finally(() => setLoading(false));
-  }, [selectedAccount, page]);
+  }, [selectedAccount, page, usingMockData, accounts]);
 
   const totalPages = Math.ceil(total / limit);
+
+  // Summary stats
+  const totalDiscrepancy = alerts.reduce((sum, a) => sum + a.discrepancyAmount, 0);
+  const avgDiscrepancy = alerts.length > 0 ? totalDiscrepancy / alerts.length : 0;
+  const largestDiscrepancy = alerts.length > 0 ? Math.max(...alerts.map((a) => a.discrepancyAmount)) : 0;
 
   function formatCurrency(n: number) {
     return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
@@ -111,6 +149,43 @@ export default function AlertsDashboard() {
           </Select>
           <Badge variant="secondary">{total} alert{total !== 1 ? "s" : ""}</Badge>
         </div>
+      </div>
+
+      {usingMockData && (
+        <div className="bg-primary/10 text-primary text-sm px-4 py-2 rounded-lg border border-primary/20">
+          Showing demo data — connect an Outlook account to see real alerts
+        </div>
+      )}
+
+      {/* Summary stat cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Discrepancy</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">{formatCurrency(totalDiscrepancy)}</p>
+            <p className="text-xs text-muted-foreground mt-1">across {total} invoice{total !== 1 ? "s" : ""}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Average Discrepancy</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">{formatCurrency(avgDiscrepancy)}</p>
+            <p className="text-xs text-muted-foreground mt-1">per flagged invoice</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Largest Discrepancy</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold text-destructive">{formatCurrency(largestDiscrepancy)}</p>
+            <p className="text-xs text-muted-foreground mt-1">single invoice</p>
+          </CardContent>
+        </Card>
       </div>
 
       <Card>
@@ -179,7 +254,7 @@ export default function AlertsDashboard() {
                             </div>
                             <div>
                               <span className="text-muted-foreground">Line Items:</span>
-                              <pre className="mt-1 text-xs bg-card p-2 rounded max-h-32 overflow-auto">
+                              <pre className="mt-1 text-xs bg-card p-2 rounded max-h-32 overflow-auto border border-border">
                                 {(() => {
                                   try {
                                     return JSON.stringify(JSON.parse(alert.lineItems), null, 2);

@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { MOCK_ACCOUNT } from "@/lib/mock-data";
 
 interface Account {
   id: string;
@@ -53,12 +54,25 @@ export default function AccountsPage() {
   const [newSchedule, setNewSchedule] = useState("*/5 * * * *");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [usingMockData, setUsingMockData] = useState(false);
 
   async function loadAccounts() {
     setLoading(true);
-    const res = await fetch("/api/accounts");
-    const data = await res.json();
-    setAccounts(Array.isArray(data) ? data : []);
+    try {
+      const res = await fetch("/api/accounts");
+      const data = await res.json();
+      const accs = Array.isArray(data) ? data : [];
+      if (accs.length === 0) {
+        setAccounts([MOCK_ACCOUNT as Account]);
+        setUsingMockData(true);
+      } else {
+        setAccounts(accs);
+        setUsingMockData(false);
+      }
+    } catch {
+      setAccounts([MOCK_ACCOUNT as Account]);
+      setUsingMockData(true);
+    }
     setLoading(false);
   }
 
@@ -90,7 +104,7 @@ export default function AccountsPage() {
       setNewEmail("");
       setSaving(false);
 
-      // Redirect to Google OAuth
+      // Redirect to Microsoft OAuth
       if (oauthUrl) {
         window.location.href = oauthUrl;
       } else {
@@ -103,6 +117,7 @@ export default function AccountsPage() {
   }
 
   async function toggleAccount(id: string, enabled: boolean) {
+    if (usingMockData) return;
     await fetch(`/api/accounts/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -112,6 +127,7 @@ export default function AccountsPage() {
   }
 
   async function updateSchedule(id: string, cronSchedule: string) {
+    if (usingMockData) return;
     await fetch(`/api/accounts/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -121,6 +137,7 @@ export default function AccountsPage() {
   }
 
   async function removeAccount(id: string) {
+    if (usingMockData) return;
     if (!confirm("Remove this account? All alerts and rules for it will be deleted.")) return;
     await fetch(`/api/accounts/${id}`, { method: "DELETE" });
     loadAccounts();
@@ -157,7 +174,7 @@ export default function AccountsPage() {
             <DialogHeader>
               <DialogTitle>Connect Outlook Account</DialogTitle>
               <DialogDescription>
-                Enter the email address to monitor. You&apos;ll be redirected to Google to grant access to your mailbox.
+                Enter the email address to monitor. You&apos;ll be redirected to Microsoft to grant access to your mailbox.
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleAddAccount} className="space-y-4 mt-2">
@@ -200,20 +217,14 @@ export default function AccountsPage() {
         </Dialog>
       </div>
 
+      {usingMockData && (
+        <div className="bg-primary/10 text-primary text-sm px-4 py-2 rounded-lg border border-primary/20">
+          Showing demo data — connect an Outlook account to see real data
+        </div>
+      )}
+
       {loading ? (
         <div className="p-8 text-center text-muted-foreground">Loading accounts...</div>
-      ) : accounts.length === 0 ? (
-        <Card>
-          <CardContent className="p-8 text-center">
-            <p className="text-lg font-medium">No accounts connected</p>
-            <p className="text-muted-foreground text-sm mt-1">
-              Add an Outlook account to start monitoring invoices for math discrepancies.
-            </p>
-            <Button className="mt-4" onClick={() => setAddOpen(true)}>
-              Add Your First Account
-            </Button>
-          </CardContent>
-        </Card>
       ) : (
         <div className="grid gap-4">
           {accounts.map((account) => (

@@ -29,6 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { MOCK_ACCOUNTS_SIMPLE, MOCK_RULES } from "@/lib/mock-data";
 
 interface Account {
   id: string;
@@ -84,28 +85,49 @@ export default function RulesPage() {
   const [senderEmail, setSenderEmail] = useState("");
   const [senderDomain, setSenderDomain] = useState("");
 
+  const [usingMockData, setUsingMockData] = useState(false);
+
   useEffect(() => {
     fetch("/api/accounts")
       .then((r) => r.json())
       .then((data) => {
         const accs = Array.isArray(data) ? data : [];
-        setAccounts(accs);
-        if (accs.length > 0 && !selectedAccount) {
-          setSelectedAccount(accs[0].id);
+        if (accs.length === 0) {
+          setAccounts(MOCK_ACCOUNTS_SIMPLE);
+          setSelectedAccount(MOCK_ACCOUNTS_SIMPLE[0].id);
+          setRules(MOCK_RULES as Rule[]);
+          setUsingMockData(true);
+        } else {
+          setAccounts(accs);
+          if (accs.length > 0 && !selectedAccount) {
+            setSelectedAccount(accs[0].id);
+          }
         }
+        setLoading(false);
+      })
+      .catch(() => {
+        setAccounts(MOCK_ACCOUNTS_SIMPLE);
+        setSelectedAccount(MOCK_ACCOUNTS_SIMPLE[0].id);
+        setRules(MOCK_RULES as Rule[]);
+        setUsingMockData(true);
         setLoading(false);
       });
   }, []);
 
   useEffect(() => {
-    if (!selectedAccount) return;
+    if (!selectedAccount || usingMockData) return;
     loadRules();
-  }, [selectedAccount]);
+  }, [selectedAccount, usingMockData]);
 
   async function loadRules() {
-    const res = await fetch(`/api/rules?accountId=${selectedAccount}`);
-    const data = await res.json();
-    setRules(Array.isArray(data) ? data : []);
+    try {
+      const res = await fetch(`/api/rules?accountId=${selectedAccount}`);
+      const data = await res.json();
+      setRules(Array.isArray(data) ? data : []);
+    } catch {
+      setRules(MOCK_RULES as Rule[]);
+      setUsingMockData(true);
+    }
   }
 
   function buildRuleValue(): string {
@@ -371,6 +393,22 @@ export default function RulesPage() {
         </div>
       </div>
 
+      {usingMockData && (
+        <div className="bg-primary/10 text-primary text-sm px-4 py-2 rounded-lg border border-primary/20">
+          Showing demo data — connect an Outlook account to create real rules
+        </div>
+      )}
+
+      <Card className="border-primary/20 bg-primary/5">
+        <CardContent className="p-4">
+          <p className="text-sm">
+            <span className="font-semibold">Default behavior:</span>{" "}
+            Every incoming email is automatically checked for invoice math errors by AI, even without any rules.
+            Rules only filter <em>which</em> emails are processed — they don&apos;t enable the math check.
+          </p>
+        </CardContent>
+      </Card>
+
       {loading ? (
         <div className="p-8 text-center text-muted-foreground">Loading...</div>
       ) : accounts.length === 0 ? (
@@ -378,7 +416,7 @@ export default function RulesPage() {
           <CardContent className="p-8 text-center">
             <p className="text-lg font-medium">No accounts connected</p>
             <p className="text-muted-foreground text-sm mt-1">
-              Add a Gmail account first before configuring rules.
+              Add an Outlook account first before configuring rules.
             </p>
           </CardContent>
         </Card>
