@@ -232,7 +232,14 @@ export default function AlertsDashboard() {
                       onClick={() => router.push(`/dashboard/alerts/${alert.id}`)}
                     >
                       <TableCell className="text-sm">{formatDate(alert.createdAt)}</TableCell>
-                      <TableCell className="font-medium">{alert.freelancer}</TableCell>
+                      <TableCell className="font-medium">
+                        {usingMockData && (
+                          <Badge variant="outline" className="mr-2 text-[10px] px-1.5 py-0 font-bold text-muted-foreground border-muted-foreground/40">
+                            DEMO
+                          </Badge>
+                        )}
+                        {alert.freelancer}
+                      </TableCell>
                       <TableCell>{alert.invoiceNumber || "—"}</TableCell>
                       <TableCell className="text-muted-foreground text-sm">
                         {alert.account.email}
