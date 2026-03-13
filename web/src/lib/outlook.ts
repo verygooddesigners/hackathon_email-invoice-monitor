@@ -193,7 +193,7 @@ export async function getAttachments(
 ): Promise<OutlookAttachment[]> {
   const data = await graphGet(
     accessToken,
-    `/me/messages/${messageId}/attachments?$select=id,name,contentType,contentBytes,size`
+    `/me/messages/${messageId}/attachments`
   );
   // Filter to file attachments only (skip inline images, reference attachments, etc.)
   return (data.value || []).filter(
