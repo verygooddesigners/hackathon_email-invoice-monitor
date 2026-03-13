@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice Monitor — Dev Tasks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #0f0f0f;
+    color: #e0e0e0;
+    min-height: 100vh;
+    padding: 2rem;
+  }
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1.5rem;
+  }
+  /* Add Task Form */
+  .add-form {
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-end;
+  }
+  .add-form .field { flex: 1; }
+  .add-form label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.35rem;
+  }
+  .add-form textarea {
+    width: 100%;
+    background: #0f0f0f;
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: #e0e0e0;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    padding: 0.6rem 0.75rem;
+    resize: vertical;
+    min-height: 60px;
+  }
+  .add-form textarea:focus { outline: none; border-color: #555; }
+  .add-form select {
+    background: #0f0f0f;
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: #e0e0e0;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    padding: 0.6rem 0.75rem;
+    cursor: pointer;
+  }
+  .add-form select:focus { outline: none; border-color: #555; }
+  .add-btn {
+    background: #fff;
+    color: #0f0f0f;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.25rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .add-btn:hover { background: #ddd; }
+
+  /* API Key Section */
+  .api-key-bar {
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+    color: #888;
+  }
+  .api-key-bar input {
+    flex: 1;
+    background: #0f0f0f;
+    border: 1px solid #333;
+    border-radius: 6px;
+    color: #e0e0e0;
+    font-family: 'Inter', monospace;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+  }
+  .api-key-bar input:focus { outline: none; border-color: #555; }
+  .api-key-bar button {
+    background: #333;
+    color: #e0e0e0;
+    border: none;
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+  .api-key-bar button:hover { background: #444; }
+
+  /* Groups */
+  .group { margin-bottom: 1.5rem; }
+  .group-header {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #666;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+  }
+  .group-header .count {
+    background: #333;
+    color: #999;
+    font-size: 0.65rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+  }
+  .group-header .toggle { font-size: 0.65rem; color: #555; }
+
+  /* Task Cards */
+  .task-card {
+    background: #1a1a1a;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .task-card:hover { background: #222; }
+  .task-card .title { flex: 1; font-size: 0.9rem; font-weight: 500; }
+  .task-card .badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+  }
+  .badge-high { background: #3d1515; color: #f87171; }
+  .badge-medium { background: #3d2f15; color: #fbbf24; }
+  .badge-low { background: #153d1a; color: #4ade80; }
+  .badge-future { background: #2a153d; color: #c084fc; }
+  .task-card .complexity {
+    font-size: 0.7rem;
+    color: #666;
+    font-weight: 500;
+  }
+  .task-card .complete-btn {
+    background: none;
+    border: 2px solid #333;
+    border-radius: 6px;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .task-card .complete-btn:hover { border-color: #4ade80; background: #153d1a; }
+
+  /* Inbox processing indicator */
+  .processing {
+    background: #1a1a1a;
+    border: 1px dashed #333;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+    color: #666;
+  }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid #333;
+    border-top: 2px solid #888;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: #1a1a1a;
+    border-radius: 14px;
+    padding: 1.75rem;
+    max-width: 550px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .modal h2 { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 1rem; }
+  .modal .detail-row {
+    margin-bottom: 0.75rem;
+  }
+  .modal .detail-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #666;
+    margin-bottom: 0.2rem;
+  }
+  .modal .detail-value { font-size: 0.875rem; color: #ccc; line-height: 1.5; }
+  .modal .close-btn {
+    background: #333;
+    color: #e0e0e0;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin-top: 1rem;
+  }
+  .modal .close-btn:hover { background: #444; }
+
+  /* Completed tasks */
+  .completed .task-card { opacity: 0.5; }
+  .completed .task-card .title { text-decoration: line-through; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<h1>Invoice Monitor — Dev Tasks</h1>
+
+<div class="api-key-bar">
+  <span>Anthropic API Key (dev only):</span>
+  <input type="password" id="apiKeyInput" placeholder="sk-ant-...">
+  <button onclick="saveApiKey()">Save</button>
+</div>
+
+<div class="add-form">
+  <div class="field">
+    <label>Description</label>
+    <textarea id="taskDescription" placeholder="Describe the task..."></textarea>
+  </div>
+  <div>
+    <label>Priority</label>
+    <select id="taskPriority">
+      <option value="Medium">Medium</option>
+      <option value="High">High</option>
+      <option value="Low">Low</option>
+      <option value="Future">Future</option>
+    </select>
+  </div>
+  <button class="add-btn" onclick="addTask()">Add</button>
+</div>
+
+<div id="inbox" class="group">
+  <div class="group-header" onclick="toggleGroup('inbox')">
+    <span class="toggle" id="inbox-toggle">▼</span>
+    Inbox <span class="count" id="inbox-count">0</span>
+  </div>
+  <div id="inbox-list"></div>
+</div>
+
+<div id="upcoming" class="group">
+  <div class="group-header" onclick="toggleGroup('upcoming')">
+    <span class="toggle" id="upcoming-toggle">▼</span>
+    Upcoming <span class="count" id="upcoming-count">0</span>
+  </div>
+  <div id="upcoming-list"></div>
+</div>
+
+<div id="completed" class="group">
+  <div class="group-header" onclick="toggleGroup('completed')">
+    <span class="toggle" id="completed-toggle">▶</span>
+    Completed <span class="count" id="completed-count">0</span>
+  </div>
+  <div id="completed-list" class="completed hidden"></div>
+</div>
+
+<div id="future" class="group">
+  <div class="group-header" onclick="toggleGroup('future')">
+    <span class="toggle" id="future-toggle">▼</span>
+    Future <span class="count" id="future-count">0</span>
+  </div>
+  <div id="future-list"></div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+const STORAGE_KEY = 'invoice-monitor-tasks';
+const API_KEY_STORAGE = 'invoice-monitor-api-key';
+
+// Load state
+let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{"tasks":[]}').tasks;
+document.getElementById('apiKeyInput').value = localStorage.getItem(API_KEY_STORAGE) || '';
+
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  localStorage.setItem(API_KEY_STORAGE, key);
+}
+
+function getApiKey() {
+  return localStorage.getItem(API_KEY_STORAGE) || '';
+}
+
+function saveTasks() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ tasks }));
+}
+
+function generateId() {
+  return crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+
+// Render
+function render() {
+  const groups = { inbox: [], upcoming: [], completed: [], future: [] };
+  tasks.forEach(t => {
+    if (t.status === 'completed') groups.completed.push(t);
+    else if (t.priority === 'Future') groups.future.push(t);
+    else if (t.status === 'inbox') groups.inbox.push(t);
+    else groups.upcoming.push(t);
+  });
+
+  // Sort upcoming by AI position
+  groups.upcoming.sort((a, b) => (a.ai_position || 999) - (b.ai_position || 999));
+
+  ['inbox', 'upcoming', 'completed', 'future'].forEach(group => {
+    const list = document.getElementById(group + '-list');
+    const count = document.getElementById(group + '-count');
+    count.textContent = groups[group].length;
+    list.innerHTML = groups[group].map(t => taskCard(t, group)).join('');
+  });
+}
+
+function taskCard(task, group) {
+  const priorityClass = 'badge-' + (task.priority || 'medium').toLowerCase();
+  const title = task.ai_title || task.description.substring(0, 60) + (task.description.length > 60 ? '...' : '');
+  const complexity = task.ai_complexity ? `<span class="complexity">${task.ai_complexity}</span>` : '';
+  const completeBtn = (group === 'upcoming' || group === 'future')
+    ? `<button class="complete-btn" onclick="event.stopPropagation(); completeTask('${task.id}')" title="Mark complete"></button>`
+    : '';
+
+  return `<div class="task-card" onclick="openModal('${task.id}')">
+    ${completeBtn}
+    <span class="title">${escapeHtml(title)}</span>
+    ${complexity}
+    <span class="badge ${priorityClass}">${task.priority}</span>
+  </div>`;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// Add task
+async function addTask() {
+  const desc = document.getElementById('taskDescription').value.trim();
+  const priority = document.getElementById('taskPriority').value;
+  if (!desc) return;
+
+  const task = {
+    id: generateId(),
+    description: desc,
+    priority: priority,
+    status: priority === 'Future' ? 'upcoming' : 'inbox',
+    ai_title: '',
+    ai_complexity: '',
+    ai_dependencies: [],
+    ai_position: 999,
+    ai_reasoning: '',
+    created_at: new Date().toISOString(),
+    completed_at: null,
+  };
+
+  // If Future priority, skip AI processing
+  if (priority === 'Future') {
+    task.ai_title = desc.substring(0, 60);
+    tasks.push(task);
+    saveTasks();
+    render();
+    document.getElementById('taskDescription').value = '';
+    return;
+  }
+
+  tasks.push(task);
+  saveTasks();
+  render();
+  document.getElementById('taskDescription').value = '';
+
+  // AI processing
+  await processTaskWithAI(task.id);
+}
+
+async function processTaskWithAI(taskId) {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    // No API key — just move to upcoming with basic title
+    const task = tasks.find(t => t.id === taskId);
+    if (task) {
+      task.status = 'upcoming';
+      task.ai_title = task.description.substring(0, 60);
+      saveTasks();
+      render();
+    }
+    return;
+  }
+
+  const task = tasks.find(t => t.id === taskId);
+  if (!task) return;
+
+  // Build context of all current tasks
+  const allTasks = tasks.map(t => ({
+    id: t.id,
+    title: t.ai_title || t.description.substring(0, 60),
+    priority: t.priority,
+    status: t.status,
+    complexity: t.ai_complexity,
+  }));
+
+  const systemPrompt = `You are a task analysis assistant for a software project (Invoice Monitor — a Python service that monitors Gmail inboxes for freelancer invoices).
+
+Analyze the new task in the context of all existing tasks. Return a JSON object with:
+- title: A short display title (max 60 chars)
+- complexity: "Small", "Medium", or "Large"
+- dependencies: Array of other task titles this depends on (by name, or empty array)
+- position: Recommended position in the upcoming queue (1 = do first)
+- reasoning: Brief explanation of your ordering decision (1-2 sentences)
+
+Return ONLY valid JSON, no preamble.`;
+
+  const userMsg = `New task:
+Description: ${task.description}
+Priority: ${task.priority}
+
+Current tasks:
+${JSON.stringify(allTasks, null, 2)}`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 512,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMsg }],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const text = data.content[0].text.trim();
+    const result = JSON.parse(text);
+
+    task.ai_title = result.title || task.description.substring(0, 60);
+    task.ai_complexity = result.complexity || '';
+    task.ai_dependencies = result.dependencies || [];
+    task.ai_position = result.position || 999;
+    task.ai_reasoning = result.reasoning || '';
+    task.status = 'upcoming';
+
+  } catch (err) {
+    console.error('AI processing failed:', err);
+    task.ai_title = task.description.substring(0, 60);
+    task.status = 'upcoming';
+  }
+
+  saveTasks();
+  render();
+}
+
+// Complete task
+function completeTask(taskId) {
+  const task = tasks.find(t => t.id === taskId);
+  if (task) {
+    task.status = 'completed';
+    task.completed_at = new Date().toISOString();
+    saveTasks();
+    render();
+  }
+}
+
+// Modal
+function openModal(taskId) {
+  const task = tasks.find(t => t.id === taskId);
+  if (!task) return;
+
+  const deps = task.ai_dependencies && task.ai_dependencies.length
+    ? task.ai_dependencies.join(', ')
+    : 'None detected';
+
+  const upcomingCount = tasks.filter(t => t.status === 'upcoming').length;
+  const positionText = task.ai_position && task.ai_position < 999
+    ? `Suggested: ${task.ai_position} of ${upcomingCount} in Upcoming`
+    : 'Not ranked';
+
+  document.getElementById('modal').innerHTML = `
+    <h2>${escapeHtml(task.ai_title || task.description.substring(0, 60))}</h2>
+    <div class="detail-row"><div class="detail-label">Description</div><div class="detail-value">${escapeHtml(task.description)}</div></div>
+    <div class="detail-row"><div class="detail-label">Priority</div><div class="detail-value">${task.priority}</div></div>
+    <div class="detail-row"><div class="detail-label">Complexity</div><div class="detail-value">${task.ai_complexity || 'N/A'}</div></div>
+    <div class="detail-row"><div class="detail-label">Dependencies</div><div class="detail-value">${escapeHtml(deps)}</div></div>
+    <div class="detail-row"><div class="detail-label">Queue Position</div><div class="detail-value">${positionText}</div></div>
+    <div class="detail-row"><div class="detail-label">AI Reasoning</div><div class="detail-value">${escapeHtml(task.ai_reasoning || 'N/A')}</div></div>
+    <div class="detail-row"><div class="detail-label">Created</div><div class="detail-value">${new Date(task.created_at).toLocaleString()}</div></div>
+    ${task.completed_at ? `<div class="detail-row"><div class="detail-label">Completed</div><div class="detail-value">${new Date(task.completed_at).toLocaleString()}</div></div>` : ''}
+    <button class="close-btn" onclick="closeModal()">Close</button>
+  `;
+
+  document.getElementById('modalOverlay').classList.add('active');
+}
+
+function closeModal(event) {
+  if (!event || event.target.id === 'modalOverlay') {
+    document.getElementById('modalOverlay').classList.remove('active');
+  }
+}
+
+// Toggle group visibility
+function toggleGroup(group) {
+  const list = document.getElementById(group + '-list');
+  const toggle = document.getElementById(group + '-toggle');
+  if (list.classList.contains('hidden')) {
+    list.classList.remove('hidden');
+    toggle.textContent = '▼';
+  } else {
+    list.classList.add('hidden');
+    toggle.textContent = '▶';
+  }
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// Initial render
+render();
+</script>
+</body>
+</html>
