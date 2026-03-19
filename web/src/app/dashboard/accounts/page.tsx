@@ -54,6 +54,7 @@ export default function AccountsPage() {
   const [newSchedule, setNewSchedule] = useState("*/5 * * * *");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [usingMockData, setUsingMockData] = useState(false);
 
   async function loadAccounts() {
@@ -78,7 +79,7 @@ export default function AccountsPage() {
 
   useEffect(() => {
     loadAccounts();
-    // Show OAuth error messages from the callback redirect
+    // Show OAuth result messages from the callback redirect
     const params = new URLSearchParams(window.location.search);
     const oauthError = params.get("error");
     const oauthMessage = params.get("message");
@@ -88,9 +89,16 @@ export default function AccountsPage() {
           ? decodeURIComponent(oauthMessage)
           : oauthError === "missing_params"
           ? "Microsoft did not return an authorization code. Please try again."
-          : `OAuth error: ${oauthError}`
+          : oauthError === "oauth_failed"
+          ? "Could not complete the Microsoft sign-in. Please try again or check your configuration."
+          : `Sign-in error: ${oauthError}`
       );
       // Clean URL
+      window.history.replaceState({}, "", "/dashboard/accounts");
+    }
+    const oauthSuccess = params.get("success");
+    if (oauthSuccess === "connected") {
+      setSuccess("Microsoft account connected successfully.");
       window.history.replaceState({}, "", "/dashboard/accounts");
     }
   }, []);
@@ -149,6 +157,21 @@ export default function AccountsPage() {
       body: JSON.stringify({ cronSchedule }),
     });
     loadAccounts();
+  }
+
+  async function handleReconnect(id: string) {
+    if (usingMockData) return;
+    try {
+      const res = await fetch(`/api/accounts/${id}`);
+      if (!res.ok) {
+        setError("Failed to generate a reconnect link. Please try again.");
+        return;
+      }
+      const { oauthUrl } = await res.json();
+      if (oauthUrl) window.location.href = oauthUrl;
+    } catch {
+      setError("Something went wrong generating the reconnect link.");
+    }
   }
 
   async function removeAccount(id: string) {
@@ -238,6 +261,12 @@ export default function AccountsPage() {
         </div>
       )}
 
+      {success && !addOpen && (
+        <div className="bg-green-500/10 text-green-700 text-sm px-4 py-3 rounded-lg border border-green-500/20">
+          <strong>Connected:</strong> {success}
+        </div>
+      )}
+
       {usingMockData && (
         <div className="bg-primary/10 text-primary text-sm px-4 py-2 rounded-lg border border-primary/20">
           Showing demo data — connect an Outlook account to see real data
@@ -265,6 +294,15 @@ export default function AccountsPage() {
                     )}
                   </div>
                   <div className="flex items-center gap-2">
+                    {!account.googleTokens && !usingMockData && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleReconnect(account.id)}
+                      >
+                        Connect with Microsoft
+                      </Button>
+                    )}
                     {account.googleTokens && (
                       <Button
                         variant="outline"
